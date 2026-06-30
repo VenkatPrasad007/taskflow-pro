@@ -155,6 +155,23 @@ http://localhost:8080
 | Tasks  | PUT    | `/api/tasks/{id}` | Update an existing task | Planned |
 | Tasks  | DELETE | `/api/tasks/{id}` | Delete a task           | Planned |
 
+
+## API Documentation
+
+Interactive API documentation available via Swagger UI.
+
+**Local:** http://localhost:8080/swagger-ui.html
+
+### Endpoints Overview
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | /api/v1/tasks | Create a new task |
+| GET | /api/v1/tasks | Get all tasks (filter by status/priority) |
+| GET | /api/v1/tasks/{id} | Get task by ID |
+| PUT | /api/v1/tasks/{id} | Update a task |
+| PATCH | /api/v1/tasks/{id}/status | Update task status |
+| DELETE | /api/v1/tasks/{id} | Delete a task |
+
 ---
 
 ## 📷 Screenshots
