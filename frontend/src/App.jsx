@@ -4,6 +4,7 @@ import TaskCard from "./components/TaskCard";
 import FilterBar from "./components/FilterBar";
 import Modal from "./components/Modal";
 import CreateTaskForm from "./components/CreateTaskForm";
+import EditTaskForm from "./components/EditTaskForm";
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
@@ -11,10 +12,30 @@ export default function App() {
   const [error, setError] = useState(null);
   const [activeFilter, setActiveFilter] = useState("ALL");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
 
   useEffect(() => {
     fetchTasks();
   }, []);
+
+  const handleEditClick = (task) => {
+    setSelectedTask(task);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteClick = async (task) => {
+    const confirmed = window.confirm(
+      `Delete "${task.title}"? This cannot be undone.`,
+    );
+    if (!confirmed) return;
+    try {
+      await taskApi.delete(task.id);
+      fetchTasks();
+    } catch (err) {
+      alert("Failed to delete task. Please try again.");
+    }
+  };
 
   const fetchTasks = async () => {
     try {
@@ -107,7 +128,12 @@ export default function App() {
         ) : (
           <div className="grid gap-3">
             {filteredTasks.map((task) => (
-              <TaskCard key={task.id} task={task} />
+              <TaskCard
+                key={task.id}
+                task={task}
+                onEdit={handleEditClick}
+                onDelete={handleDeleteClick}
+              />
             ))}
           </div>
         )}
@@ -124,6 +150,26 @@ export default function App() {
           }}
           onCancel={() => setIsCreateModalOpen(false)}
         />
+      </Modal>
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        title="Edit Task"
+      >
+        {selectedTask && (
+          <EditTaskForm
+            task={selectedTask}
+            onSuccess={() => {
+              setIsEditModalOpen(false);
+              setSelectedTask(null);
+              fetchTasks();
+            }}
+            onCancel={() => {
+              setIsEditModalOpen(false);
+              setSelectedTask(null);
+            }}
+          />
+        )}
       </Modal>
     </div>
   );
