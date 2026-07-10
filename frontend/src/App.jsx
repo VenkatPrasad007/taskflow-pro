@@ -5,6 +5,8 @@ import FilterBar from "./components/FilterBar";
 import Modal from "./components/Modal";
 import CreateTaskForm from "./components/CreateTaskForm";
 import EditTaskForm from "./components/EditTaskForm";
+import Toast from "./components/Toast";
+import { useToast } from "./hooks/useToast";
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
@@ -14,6 +16,7 @@ export default function App() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
+  const { toast, showToast, hideToast } = useToast();
 
   useEffect(() => {
     fetchTasks();
@@ -32,8 +35,9 @@ export default function App() {
     try {
       await taskApi.delete(task.id);
       fetchTasks();
+      showToast("Task deleted", "info");
     } catch (err) {
-      alert("Failed to delete task. Please try again.");
+      showToast("Failed to delete task", "error");
     }
   };
 
@@ -95,13 +99,13 @@ export default function App() {
           <div>
             <h1 className="text-xl font-bold text-gray-900">TaskFlow Pro</h1>
             <p className="text-xs text-gray-400 mt-0.5">
-              Task Management System
+              {tasks.length} task{tasks.length !== 1 ? "s" : ""} total
             </p>
           </div>
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium 
-             rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium
+                 rounded-lg hover:bg-blue-700 transition-colors"
           >
             + New Task
           </button>
@@ -117,13 +121,29 @@ export default function App() {
         />
 
         {filteredTasks.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-gray-400 text-lg">No tasks found</p>
-            <p className="text-gray-300 text-sm mt-1">
+          <div className="text-center py-20">
+            <div className="text-6xl mb-4">
+              {activeFilter !== "ALL" ? "🔍" : "📋"}
+            </div>
+            <h3 className="text-gray-600 font-medium text-lg mb-1">
               {activeFilter !== "ALL"
-                ? "Try a different filter"
+                ? `No ${activeFilter.replace("_", " ").toLowerCase()} tasks`
+                : "No tasks yet"}
+            </h3>
+            <p className="text-gray-400 text-sm mb-6">
+              {activeFilter !== "ALL"
+                ? "Try a different filter or create a new task"
                 : "Create your first task to get started"}
             </p>
+            {activeFilter === "ALL" && (
+              <button
+                onClick={() => setIsCreateModalOpen(true)}
+                className="px-4 py-2 bg-blue-600 text-white text-sm
+                   rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                + Create your first task
+              </button>
+            )}
           </div>
         ) : (
           <div className="grid gap-3">
@@ -147,6 +167,7 @@ export default function App() {
           onSuccess={() => {
             setIsCreateModalOpen(false);
             fetchTasks();
+            showToast("Task created successfully");
           }}
           onCancel={() => setIsCreateModalOpen(false)}
         />
@@ -163,6 +184,7 @@ export default function App() {
               setIsEditModalOpen(false);
               setSelectedTask(null);
               fetchTasks();
+              showToast("Task updated successfully");
             }}
             onCancel={() => {
               setIsEditModalOpen(false);
@@ -171,6 +193,9 @@ export default function App() {
           />
         )}
       </Modal>
+      {toast && (
+        <Toast message={toast.message} type={toast.type} onClose={hideToast} />
+      )}
     </div>
   );
 }
