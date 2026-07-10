@@ -176,7 +176,12 @@ Interactive API documentation available via Swagger UI.
 
 ## 📷 Screenshots
 
-Screenshots and application previews will be added once the frontend implementation is completed.
+
+### Task Dashboard
+![Dashboard](docs/screenshots/dashboard.png)
+
+### Create Task
+![Create Task](docs/screenshots/create-task.png)
 
 ---
 
